@@ -8,3 +8,4 @@
 #include "mixed_type.h"
 #include "null_type.h"
 #include "string_type.h"
+#include "date_type.h"

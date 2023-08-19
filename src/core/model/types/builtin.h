@@ -43,6 +43,7 @@ BETTER_ENUM(TypeId, char,
                  * (fixed-precision floating point value) */
     kBigInt,    /* Except for nulls and empties column contains only big ints
                  * (arbitrary-precision integer value) */
+    kDate,
     kString,    /* Except for nulls and empties column contains only strings
                  * (string value, sequence of characters) */
     kNull,      /* Column contains only nulls ("NULL" value) */
