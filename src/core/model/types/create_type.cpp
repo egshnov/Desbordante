@@ -9,6 +9,7 @@
 #include "numeric_type.h"
 #include "string_type.h"
 #include "undefined_type.h"
+#include "date_type.h"
 
 namespace model {
 
@@ -22,6 +23,8 @@ std::unique_ptr<Type> CreateType(TypeId const type_id, bool const is_null_eq_nul
         return std::make_unique<StringType>();
     case TypeId::kBigInt:
         return std::make_unique<BigIntType>();
+    case TypeId::kDate:
+        return std::make_unique<DateType>();
     case TypeId::kNull:
         return std::make_unique<NullType>(is_null_eq_null);
     case TypeId::kEmpty:

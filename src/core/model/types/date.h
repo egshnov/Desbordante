@@ -63,7 +63,6 @@ public:
         this->month = 0;
         this->year = 0;
     }
-
     explicit Date(const TimeUnit &year, const TimeUnit &month = 0, const TimeUnit &day = 0) {
         if (IsCorrect(year, month, day) || (year == 0 && month == 0 && day == 0)) {
             this->day = day;
@@ -124,19 +123,19 @@ public:
         return (boost::format("%04d-%02d-%02d") % year % month % day).str();
     }
 
-    [[nodiscard]] TimeUnit GetDay() const {  // nodiscard?
+    [[nodiscard]] TimeUnit GetDay() const {
         return day;
     }
 
-    [[nodiscard]] TimeUnit GetMonth() const {  // nodiscard?
+    [[nodiscard]] TimeUnit GetMonth() const {
         return month;
     }
 
-    [[nodiscard]] TimeUnit GetYear() const {  // nodiscard?
+    [[nodiscard]] TimeUnit GetYear() const {
         return year;
     }
 
-    [[nodiscard]] TimeUnit GetWeekday() const {  // nodiscard?
+    [[nodiscard]] TimeUnit GetWeekday() const {
         return (this->ToOrdinal() + 6) % 7;
     }
 

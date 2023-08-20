@@ -13,7 +13,7 @@
 #include "string_type.h"
 #include "type.h"
 #include "undefined_type.h"
-
+#include "date_type.h"
 namespace model {
 
 /* Holds value of any type of TypeId.
