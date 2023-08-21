@@ -5,6 +5,7 @@
 
 #include "big_int_type.h"
 #include "create_type.h"
+#include "date_type.h"
 #include "double_type.h"
 #include "empty_type.h"
 #include "int_type.h"
@@ -13,7 +14,6 @@
 #include "string_type.h"
 #include "type.h"
 #include "undefined_type.h"
-
 namespace model {
 
 /* Holds value of any type of TypeId.
@@ -68,8 +68,8 @@ public:
         throw std::logic_error("Mixed type does not have a fixed size");
     }
 
-    //It's correct, but not optimal, need to be rewrited later with other virtual
-    //Clone(std::byte const* value, std::byte const* new_value)
+    // It's correct, but not optimal, need to be rewrited later with other virtual
+    // Clone(std::byte const* value, std::byte const* new_value)
     [[nodiscard]] std::byte* Clone(std::byte const* value) const override {
         std::unique_ptr<Type> type = RetrieveType(value);
         size_t size = GetMixedValueSize(type.get());

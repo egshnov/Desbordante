@@ -193,9 +193,8 @@ TYPED_TEST(TestNumeric, Dist) {
     using Type = typename TypeParam::UnderlyingType;
     auto test = [this](Type l, Type r) {
         this->SetActualAndLiteral(l, r);
-        EXPECT_DOUBLE_EQ(std::abs(l - r),
-                         this->type_->Dist(this->actual_ptr_, this->literal_ptr_))
-            << this->GetErrorStr(l, r);
+        EXPECT_DOUBLE_EQ(std::abs(l - r), this->type_->Dist(this->actual_ptr_, this->literal_ptr_))
+                << this->GetErrorStr(l, r);
     };
 
     test(0, 100);
@@ -223,8 +222,7 @@ struct TestStringParam {
     std::string const l;
     std::string const r;
 
-    TestStringParam(std::string l, std::string r) noexcept
-        : l(std::move(l)), r(std::move(r)) {}
+    TestStringParam(std::string l, std::string r) noexcept : l(std::move(l)), r(std::move(r)) {}
 };
 
 class TestString : public ::testing::TestWithParam<TestStringParam> {};
@@ -258,10 +256,69 @@ TEST_P(TestString, Default) {
 INSTANTIATE_TEST_SUITE_P(TestStringSuite, TestString,
                          ::testing::Values(TestStringParam("123", "123"),
                                            TestStringParam("aa", "bbbb"),
-                                           TestStringParam("a", "abcde"),
-                                           TestStringParam("", ""),
-                                           TestStringParam("", "abc"),
-                                           TestStringParam("abc", ""),
+                                           TestStringParam("a", "abcde"), TestStringParam("", ""),
+                                           TestStringParam("", "abc"), TestStringParam("abc", ""),
                                            TestStringParam("bb", "aa")));
 
+
+struct TestDateTypeParam {
+    std::string const l;
+    std::string const r;
+
+    TestDateTypeParam(std::string l, std::string r) noexcept : l(std::move(l)), r(std::move(r)) {}
+};
+
+class TestDateType : public ::testing::TestWithParam<TestDateTypeParam> {};
+
+TEST_P(TestDateType, Default) {
+    using Date = boost::gregorian::date;
+    TestDateTypeParam p = GetParam();
+    std::string const& l_val = p.l;
+    std::string const& r_val = p.r;
+
+    std::unique_ptr<mo::Type> type(mo::CreateType(mo::TypeId::kDate, true));
+    auto* date_type = static_cast<mo::DateType*>(type.get());
+    Date d1(boost::gregorian::from_string(l_val));
+    Date d2(boost::gregorian::from_string(r_val));
+    model::CompareResult cr = mo::DateType::Compare(d1, d2);
+
+    using Owner = std::unique_ptr<std::byte[]>;
+    Owner l_owner(date_type->MakeValue(d1));
+    Owner r_owner(date_type->MakeValue(d2));
+    std::byte* l = l_owner.get();
+    std::byte* r = r_owner.get();
+    EXPECT_EQ(date_type->Compare(l, r), cr);
+
+    auto* val = new std::byte[date_type->GetSize()];
+    date_type->ValueFromStr(val, l_val);
+    EXPECT_EQ(date_type->Compare(l, val), mo::CompareResult::kEqual);
+    delete[] val;
+
+    auto delta_type = std::make_unique<mo::IntType>();
+    boost::gregorian::date_duration delta = d1 - d2;
+    val = delta_type->MakeValue(delta.days());
+    EXPECT_EQ(mo::Type::GetValue<mo::DateDelta>(val), d1 - d2);
+
+    date_type->SubDate(l, r, val);
+    EXPECT_EQ(mo::Type::GetValue<mo::DateDelta>(val), d1 - d2);
+
+    auto* res = new std::byte[date_type->GetSize()];
+    date_type->AddDelta(r, val, res);
+    EXPECT_EQ(date_type->Compare(res, l), mo::CompareResult::kEqual);
+
+    date_type->SubDelta(l, val, res);
+    EXPECT_EQ(date_type->Compare(res, r), mo::CompareResult::kEqual);
+
+    delete[] res;
+    delete[] val;
+}
+INSTANTIATE_TEST_SUITE_P(TestDateSuite, TestDateType,
+                         ::testing::Values(TestDateTypeParam("2022-11-05", "2022-11-05"),
+                                           TestDateTypeParam("2022-01-11", "2022-01-11"),
+                                           TestDateTypeParam("2001-01-01", "2023-08-21"),
+                                           TestDateTypeParam("2001-12-31", "2015-12-31"),
+                                           TestDateTypeParam("2024-01-01", "2025-01-01"),
+                                           TestDateTypeParam("2023-09-01", "2023-08-31"),
+                                           TestDateTypeParam("2019-07-15", "1925-01-01"),
+                                           TestDateTypeParam("2005-01-20", "2023-09-01")));
 }  // namespace tests

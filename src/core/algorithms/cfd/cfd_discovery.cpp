@@ -18,14 +18,13 @@ CFDDiscovery::CFDDiscovery(std::vector<std::string_view> phase_names)
     : Algorithm(std::move(phase_names)) {
     using namespace config::names;
     RegisterOptions();
-    MakeOptionsAvailable({kTable, kEqualNulls, kCfdColumnsNumber, kCfdTuplesNumber});
+    MakeOptionsAvailable({kTable, kCfdColumnsNumber, kCfdTuplesNumber});
 }
 
 CFDDiscovery::CFDDiscovery() : CFDDiscovery({kDefaultPhaseName}) {}
 
 void CFDDiscovery::LoadDataInternal() {
-    relation_ = CFDRelationData::CreateFrom(*input_table_, is_null_equal_null_, columns_number_,
-                                            tuples_number_);
+    relation_ = CFDRelationData::CreateFrom(*input_table_, columns_number_, tuples_number_);
 
     if (relation_->GetColumnData().empty()) {
         throw std::runtime_error("Got an empty .csv file: CFD mining is meaningless.");
@@ -43,7 +42,6 @@ void CFDDiscovery::RegisterOptions() {
     RegisterOption(config::TableOpt(&input_table_));
     RegisterOption(Option{&columns_number_, kCfdColumnsNumber, kDCfdColumnsNumber, 0u});
     RegisterOption(Option{&tuples_number_, kCfdTuplesNumber, kDCfdTuplesNumber, 0u});
-    RegisterOption(config::EqualNullsOpt(&is_null_equal_null_));
 }
 
 int CFDDiscovery::NrCfds() const {

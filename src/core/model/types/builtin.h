@@ -13,11 +13,13 @@ namespace model {
 using Int = int64_t; /* Type of any integer value that fits into int64 */
 namespace details {
 BOOST_STRONG_TYPEDEF(std::string, Placeholder);
-} // namespace details
+}  // namespace details
 using BigInt = details::Placeholder; /* Type of an integer that don't fit into Int */
-using Double = long double; /* Fixed-precision floating point value; also we need type for values
-                             * with arbitrary precision analogous to BigInt */
+using Double = double; /* Fixed-precision floating point value; also we need type for values
+                        * with arbitrary precision analogous to BigInt */
 using String = std::string;
+
+static_assert(sizeof(Int) == sizeof(Double));
 
 /* Dummy types */
 
@@ -40,35 +42,41 @@ BETTER_ENUM(TypeId, char,
     kInt = 0,   /* Except for nulls and empties column contains only ints
                  * (fixed-precision integer value) */
     kDouble,    /* Except for nulls and empties column contains only doubles
-                 * (fixed-precision floating point value) */
+                                     * (fixed-precision floating point value) */
     kBigInt,    /* Except for nulls and empties column contains only big ints
-                 * (arbitrary-precision integer value) */
+                                     * (arbitrary-precision integer value) */
     kString,    /* Except for nulls and empties column contains only strings
-                 * (string value, sequence of characters) */
+                                     * (string value, sequence of characters) */
+    kDate,      /*Except for nulls and empties column contains only dates
+                * (class date from boost::gregorian) */
     kNull,      /* Column contains only nulls ("NULL" value) */
     kEmpty,     /* Column contains only empties ("" value) */
     kUndefined, /* Column contains only nulls and empties */
-    kMixed      /* Except for nulls and empties column contains more than one type */
+    kMixed /* Except for nulls and empties column contains more than one type */
 );
 
-template <typename T> struct TypeConverter {};
-template <> struct TypeConverter<Int> {
+template <typename T>
+struct TypeConverter {};
+template <>
+struct TypeConverter<Int> {
     inline static constexpr auto convert = [](std::string const& v) {
         return static_cast<Int>(std::stoll(v));
     };
 };
-template <> struct TypeConverter<Double> {
+template <>
+struct TypeConverter<Double> {
     inline static constexpr auto convert = [](std::string const& v) { return std::stold(v); };
 };
-template <> struct TypeConverter<BigInt> {
+template <>
+struct TypeConverter<BigInt> {
     inline static constexpr auto convert = [](std::string& v) { return BigInt(std::move(v)); };
 };
-template <> struct TypeConverter<String> {
-    inline static constexpr auto convert = [](std::string& v) {
-        return std::move(v);
-    };
+template <>
+struct TypeConverter<String> {
+    inline static constexpr auto convert = [](std::string& v) { return std::move(v); };
 };
-template <> struct TypeConverter<Null> {
+template <>
+struct TypeConverter<Null> {
     inline static constexpr auto convert = [](std::string const& v) {
         if (v != Null::kValue) {
             throw std::invalid_argument("Cannot convert v to Null value");
@@ -76,7 +84,8 @@ template <> struct TypeConverter<Null> {
         return Null();
     };
 };
-template <> struct TypeConverter<Empty> {
+template <>
+struct TypeConverter<Empty> {
     inline static constexpr auto convert = [](std::string const& v) {
         if (!v.empty()) {
             throw std::invalid_argument("Cannot convert v to Empty value");
