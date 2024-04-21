@@ -14,7 +14,6 @@ namespace tane {
 class TaneCommon : public PliBasedFDAlgorithm {
 protected:
     config::ErrorType max_fd_error_;
-    config::ErrorType max_ucc_error_;
 
 private:
     void ResetStateFd() final;
