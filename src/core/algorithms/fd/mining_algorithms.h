@@ -9,4 +9,5 @@
 #include "algorithms/fd/fun/fun.h"
 #include "algorithms/fd/hyfd/hyfd.h"
 #include "algorithms/fd/pyro/pyro.h"
+#include "algorithms/fd/tane/pfdtane.h"
 #include "algorithms/fd/tane/tane.h"
