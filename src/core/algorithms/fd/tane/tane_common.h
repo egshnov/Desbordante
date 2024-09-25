@@ -22,6 +22,7 @@ private:
     unsigned long long ExecuteInternal() final;
     virtual config::ErrorType CalculateZeroAryFdError(ColumnData const* rhs) = 0;
     virtual config::ErrorType CalculateFdError(model::PositionListIndex const* lhs_pli,
+                                               model::PositionListIndex const* rhs_pli,
                                                model::PositionListIndex const* joint_pli) = 0;
     static double CalculateUccError(model::PositionListIndex const* pli,
                                     ColumnLayoutRelationData const* relation_data);
