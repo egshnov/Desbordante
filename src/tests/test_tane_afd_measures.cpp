@@ -104,11 +104,6 @@ TEST_P(TestTaneAfdMeasuresMining, DefaultTest) {
     auto const& p = GetParam();
     auto algos = algos::CreateAndLoadAlgorithm<algos::Tane>(p.params);
     algos->Execute();
-    // LOG(INFO) << p.params.e
-    LOG(INFO) << algos->Fletcher16();
-    for (auto i : algos->FdList()) {
-        LOG(INFO) << i.ToShortString();
-    }
     EXPECT_EQ(p.result_hash, algos->Fletcher16());
 }
 
