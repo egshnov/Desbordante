@@ -1,9 +1,9 @@
 import desbordante
 
-TABLE = 'examples/datasets/inventory_afd.csv'
+TABLE = 'datasets/inventory_afd.csv'
 ERROR = 0.1
 
-algo = desbordante.afd.algorithms.Default()
+algo = desbordante.afd.algorithms.Tane()
 algo.load_data(table=(TABLE, ',', True))
 algo.execute(error=ERROR)
 result = algo.get_fds()

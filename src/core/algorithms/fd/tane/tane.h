@@ -22,6 +22,7 @@ private:
     unsigned long long ExecuteInternal() final;
     virtual config::ErrorType CalculateZeroAryFdError(ColumnData const* rhs) = 0;
     virtual config::ErrorType CalculateFdError(model::PositionListIndex const* lhs_pli,
+                                               model::PositionListIndex const* rhs_pli,
                                                model::PositionListIndex const* joint_pli) = 0;
 
 public:
@@ -36,14 +37,31 @@ public:
 
 class Tane : public tane::TaneCommon {
 private:
+    ErrorMeasure error_measure_ = +ErrorMeasure::g1;
     void RegisterOptions();
     void MakeExecuteOptsAvailableFDInternal() override final;
     config::ErrorType CalculateZeroAryFdError(ColumnData const* rhs) override;
     config::ErrorType CalculateFdError(model::PositionListIndex const* lhs_pli,
+                                       model::PositionListIndex const* rhs_pli,
                                        model::PositionListIndex const* joint_pli) override;
 
 public:
     Tane(std::optional<ColumnLayoutRelationDataManager> relation_manager = std::nullopt);
+    config::ErrorType CalculateZeroAryG1(ColumnData const* rhs);
+    config::ErrorType CalculateG1Error(model::PositionListIndex const* lhs_pli,
+                                       model::PositionListIndex const* joint_pli);
+
+    static config::ErrorType PdepSelf(model::PositionListIndex const* x_pli);
+    static config::ErrorType CalculatePdepMeasure(model::PositionListIndex const* x_pli,
+                                                  model::PositionListIndex const* xa_pli);
+    static config::ErrorType CalculateTauMeasure(model::PositionListIndex const* x_pli,
+                                                 model::PositionListIndex const* a_pli,
+                                                 model::PositionListIndex const* xa_pli);
+    static config::ErrorType CalculateMuPlusMeasure(model::PositionListIndex const* x_pli,
+                                                    model::PositionListIndex const* a_pli,
+                                                    model::PositionListIndex const* xa_pli);
+    static config::ErrorType CalculateRhoMeasure(model::PositionListIndex const* x_pli,
+                                                 model::PositionListIndex const* xa_pli);
 };
 
 class PFDTane : public tane::TaneCommon {
@@ -53,6 +71,7 @@ private:
     void MakeExecuteOptsAvailableFDInternal() final;
     config::ErrorType CalculateZeroAryFdError(ColumnData const* rhs) override;
     config::ErrorType CalculateFdError(model::PositionListIndex const* lhs_pli,
+                                       model::PositionListIndex const* rhs_pli,
                                        model::PositionListIndex const* joint_pli) override;
 
 public:
@@ -64,5 +83,4 @@ public:
                                                ErrorMeasure error_measure,
                                                ColumnLayoutRelationData const* relation_data);
 };
-
 }  // namespace algos
